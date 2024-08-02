@@ -1,0 +1,18 @@
+# Backend Requirement
+1. Python 3.11 or Later
+2. Django 3.5 or Later
+3. Django Restframework 0.01 or later 
+4. Django-Jazzmin 3.0 or later
+5. Python-Dotenv 1.01 or Later
+6. Djoser 2.2.3 or Later
+7. Django-Cors-headers 4.4 or Later
+8. Djangorestframework-simplejwt 5.3.1 or Later
+9. Pillow 10.40.0 or later
+10. Celery 5.4 or Later
+
+# Frontend Requirement
+1. React 18.0 or later
+2. React Router 6.26 or Later
+3. Axios 1.7.3 or Later
+4. Jwt-decode 4.0.0 or Later
+5. Material-ui 5.16.6 or Later
