@@ -1,7 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 # Third-party Libraries
 from PIL import Image
+from cryptography.fernet import Fernet
+import base64
+import os
 
 
 #* Create your models here.
@@ -9,10 +13,13 @@ from PIL import Image
 #* User Profile 
 class UserProfile(models.Model):
     # Functions
+    
     def user_profile_image_directory_path(instance, filename): # Profile Save Directory
         # file will be uploaded to MEDIA_ROOT/user_name/<filename>
         return f"Profile-Images/user_{instance.user.username}/{filename}"
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE) # Relation to a user
     profile_picture = models.ImageField(upload_to=user_profile_image_directory_path, null=True, blank=True)
     
     def __str__(self) -> str:
@@ -31,14 +38,71 @@ class UserProfile(models.Model):
                 img.thumbnail(output_size)
                 # overwrite the larger image
                 img.save(self.profile_picture.path)
+
                 
+
+#* User Card Payment Detail
+
+# Ensure you have a secret key for encryption stored in settings
+if not hasattr(settings, 'ENCRYPTION_KEY'):
+    settings.ENCRYPTION_KEY = base64.urlsafe_b64encode(os.urandom(32))
+
+# Function to encrypt sensitive data using cryptography
+def encrypt_data(data):
+    fernet = Fernet(settings.ENCRYPTION_KEY)
+    encrypted_data = fernet.encrypt(data.encode())
+    return encrypted_data
+
+# Function to Decrypt sensitive data using cryptography
+def decrypt_data(encrypted_data):
+    fernet = Fernet(settings.ENCRYPTION_KEY)
+    decrypted_data = fernet.decrypt(encrypted_data).decode()
+    return decrypted_data
+
+# User Payment Card
+class PaymentCardDetail(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    cardholder_name = models.CharField(max_length=255)
+    encrypted_card_number = models.BinaryField(editable=False) # Hides it from Admin Panel 
+    encrypted_expiry_date = models.BinaryField(editable=False) #*
+    encrypted_cvv = models.BinaryField(editable=False) #*
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def set_card_number(self, card_number):
+        self.encrypted_card_number = encrypt_data(card_number)
+
+    def get_card_number(self):
+        return decrypt_data(self.encrypted_card_number)
+
+    def set_expiry_date(self, expiry_date):
+        self.encrypted_expiry_date = encrypt_data(expiry_date)
+
+    def get_expiry_date(self):
+        return decrypt_data(self.encrypted_expiry_date)
+
+    def set_cvv(self, cvv):
+        self.encrypted_cvv = encrypt_data(cvv)
+
+    def get_cvv(self):
+        return decrypt_data(self.encrypted_cvv)
+
+    def save(self, *args, **kwargs):
+        # Override save to ensure data is always encrypted
+        self.encrypted_card_number = encrypt_data(self.get_card_number())
+        self.encrypted_expiry_date = encrypt_data(self.get_expiry_date())
+        self.encrypted_cvv = encrypt_data(self.get_cvv())
+        super().save(*args, **kwargs)
         
+     
+   
 #* A User Account Model
 class Account(models.Model):
     # Choice variable
     
     ACCOUNT_TYPES = [
         ('savings', 'Savings'),
+        ('current', 'Current'),
         ('checking', 'Checking'),
         ('investment', 'Investment'),
         ('credit', 'Credit'),
@@ -212,8 +276,8 @@ class Account(models.Model):
         
     user = models.ForeignKey(User, on_delete=models.CASCADE) # user who owns the Account
     account_type = models.CharField(max_length=50, choices=ACCOUNT_TYPES) # e.g., Savings, Checking
-    balance = models.DecimalField(max_digits=12, decimal_places=2) # User Account Balance Eg: (currency) 100.00
-    currency = models.CharField(max_length=10, )  # Account Currency Eg: USD
+    balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00) # User Account Balance Eg: (currency) 100.00
+    currency = models.CharField(max_length=10, null=True, blank=True)  # Account Currency Eg: USD
     created_at = models.DateTimeField(auto_now_add=True) # Date Account was Created
     updated_at = models.DateTimeField(auto_now=True) # Date Account was Updated
 

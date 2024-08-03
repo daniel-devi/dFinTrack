@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from datetime import timedelta
@@ -39,11 +39,7 @@ def check_end_date(sender, instance, **kwargs):
     if instance.end_date == timezone.now().date():
         # when end_date matches current date valid field is equal to false
         instance.valid = False
-    else:
-        # Reschedule the signal to run again the next day
-        next_check = timezone.now() + timedelta(days=1)
-        instance.end_date = next_check
-        instance.save()
+    instance.save()
 
 
 # Update User Budget Amount_Spent on Transaction Model Change
@@ -51,6 +47,11 @@ def check_end_date(sender, instance, **kwargs):
 def update_budget_account_spent(sender, instance, **kwargs):
     user = instance.user # Get the User Account
     budget = Budget.objects.filter(user=user).filter(valid=True) # Gets User Budget that is active
+    
+    if not budget.exists():
+        # No active budget for the user, so we can safely exit the signal
+        return
+    
     budget_account = budget.amount # get amount left for Budget
     budget_account_left = budget.amount_left # get amount left for Budget
     
@@ -67,3 +68,13 @@ def update_budget_account_spent(sender, instance, **kwargs):
     
     instance.save()
     
+    
+    
+#? Financial Goal
+
+# Updates Financial Goal current_amount field be the Users Account Balance
+@receiver(pre_save, sender=FinancialGoal)
+def financial_goal_current_amount(sender, instance, **kwargs):
+    user_account_balance = Account.objects.filter(user=instance.user).balance # Get Account balance of the User
+    instance.current_amount = user_account_balance #Sets current_amount to account balance
+    instance.save()

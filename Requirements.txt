@@ -9,6 +9,10 @@
 8. Djangorestframework-simplejwt 5.3.1 or Later
 9. Pillow 10.40.0 or later
 10. Celery 5.4 or Later
+11. Cryptography 43.0.0 or Later
+12. Pandas 2.2.2 or Later
+13. Transformer 4.43.4 or later
+
 
 # Frontend Requirement
 1. React 18.0 or later

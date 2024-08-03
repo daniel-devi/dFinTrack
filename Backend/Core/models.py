@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 # Third-Party Libraries
 from uuid import uuid4
 # Accounts
@@ -234,7 +235,7 @@ class Transaction(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True, editable=True) # Time of the Transaction
     
     def __str__(self):
-        return f"{self.CURRENCY_CHOICES} {self.amount} on {self.date} - {self.description}"
+        return f"{self.CURRENCY_CHOICES} {self.amount} on {self.timestamp} - {self.description}"
 
 
 #* Model Budgets
@@ -245,6 +246,7 @@ class Budget(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)  # Budgeted amount
     amount_spent = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)# Budgeted amount_spent
     valid = models.BooleanField(default=True)
+    exceeded = models.BooleanField(default=False)
     start_date = models.DateField()  # Start date of the budget period
     end_date = models.DateField()  # End date of the budget period
     created_at = models.DateTimeField(auto_now_add=True)  # Timestamp when the budget was created
@@ -281,6 +283,9 @@ class FinancialGoal(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # Timestamp when the goal was created
     updated_at = models.DateTimeField(auto_now=True)  # Timestamp when the goal was last updated
     description = models.TextField(blank=True, null=True)  # Optional description of the goal
+    valid = models.BooleanField(default=True)
+    completed = models.BooleanField(default=False)
+
 
     def __str__(self):
         return f'{self.name} - {self.goal_type}'
@@ -295,7 +300,10 @@ class Notification(models.Model):
     NOTIFICATION_TYPES = (
         ('transaction_success', 'Transaction Success'),
         ('budget_limit', 'Budget Limit Reached'),
-        ('budget_deadline', 'Budget End Date Reached'),
+        ('budget_exceed', 'Budget Limit has been Exceeded'),
+        ('budget_deadline', 'Budget End Date has been Reached'),
+        ('financial_goal_reached', 'You have Reached your Financial Goal Congratulations 🎉'),
+        ('financial_goal_deadline', 'Financial Goal End Date has been Reached'),
         ('payment_due', 'Payment Due'),
         ('general', 'General Notification'),
         #TODO: Add more as needed
@@ -311,7 +319,6 @@ class Notification(models.Model):
         return f"Notification for {self.user.username} - {self.notification_type}"
 
 #* A Update Model for Alert
-
 class Update(models.Model):
     # Choice Variable
     
@@ -329,3 +336,44 @@ class Update(models.Model):
 
     def __str__(self):
         return f"Update for {self.user.username} - {self.update_type}"
+
+
+#* A FinancialAnalytics model
+class FinancialAnalytics(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE) # The user who owns the report
+    account = models.ForeignKey(Account, on_delete=models.CASCADE) # Users Account
+    total_income = models.DecimalField(max_digits=12, decimal_places=2, default=0.00) # income earned from transactions
+    total_expenses = models.DecimalField(max_digits=12, decimal_places=2, default=0.00) # spending from transaction
+    net_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00) # balance after expense - income
+    report_date = models.DateTimeField(default=timezone.now) # date created
+
+    def update_analytics(self): # Generates Report on past Transactions
+        transactions = Transaction.objects.filter(account=self.account, user=self.user)
+        self.total_income = sum(t.amount for t in transactions if t.transaction_type in ['credit', 'refund'])
+        self.total_expenses = sum(t.amount for t in transactions if t.transaction_type in ['debit', 'purchase'])
+        self.net_balance = self.total_income - self.total_expenses
+        self.save()
+
+    def __str__(self):
+        return f"Analytics for {self.account.name} on {self.report_date}"
+
+# A FinancialReport Model
+class FinancialReport(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE) # user Financial Reports
+    account = models.ForeignKey(Account, on_delete=models.CASCADE) # User Account
+    report_name = models.CharField(max_length=300) # Title of Report
+    generated_on = models.DateTimeField(auto_now_add=True) # Date generated
+    report_data = models.JSONField() # Data in Json Format to be sent to Frontend
+
+    def generate_report(self): # Create Report
+        analytics = FinancialAnalytics.objects.filter(account=self.account, user=self.user).latest('report_date')
+        self.report_data = {
+            'total_income': str(analytics.total_income),
+            'total_expenses': str(analytics.total_expenses),
+            'net_balance': str(analytics.net_balance),
+            'report_date': analytics.report_date.strftime('%Y-%m-%d %H:%M:%S')
+        }
+        self.save()
+
+    def __str__(self):
+        return f"Report: {self.report_name} for {self.account.name} on {self.generated_on}"

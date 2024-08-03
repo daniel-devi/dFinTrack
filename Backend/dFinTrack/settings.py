@@ -187,3 +187,49 @@ CELERY_TASK_ALWAYS_EAGER = False  # If (True) Run tasks synchronously for testin
 
 
 #### JAZZMIN CUSTOMIZATION ########
+
+# Jazzmin settings
+JAZZMIN_SETTINGS = {
+    "site_title": "dFinTrack Admin",
+    "site_header": "dFinTrack",
+    "site_brand": "dFinTrack",
+    # "site_logo": "path_to_your_logo.png",  # Add path to your logo if available
+    "welcome_sign": "Welcome to dFinTrack Admin Panel",
+    "copyright": "dFinTrack Ltd",
+    "search_model": "auth.User",
+    "user_avatar": None,
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": ["auth", "transactions", "budgets"],
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "transactions.Transaction": "fas fa-money-check-alt",
+        "budgets.Budget": "fas fa-chart-line",
+    },
+    "related_modal_active": True,
+    "custom_css": None,
+    "custom_js": None,
+    
+    ###############
+    # Change view #
+    ###############
+    # Render out the change view as a single form, or in tabs, current options are
+    # - single
+    # - horizontal_tabs (default)
+    # - vertical_tabs
+    # - collapsible
+    # - carousel
+    "changeform_format": "vertical_tabs",
+    # override change forms on a per modeladmin basis
+    "changeform_format_overrides": {"auth.user": "collapsible", "auth.group": "carousel"},
+}
+
+# Jazzmin UI Tweak
+JAZZMIN_UI_TWEAKS = {
+    "theme": "default",
+    "dark_mode_theme": "darkly",
+}
