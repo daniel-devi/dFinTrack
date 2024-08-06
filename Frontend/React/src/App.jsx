@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login"
 import RegisterPage from "./pages/Register";
 import HomePage from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
 /// Authentication Required
 import AuthenticationRequired from "./components/AuthenticationRequired";
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/logout" element={<Logout />} />
           <Route path="/register" element={<LogoutAndRegister />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<Dashboard/>}/>
           {/*
           <Route path="*" element={<NotFound />} />
           */}
