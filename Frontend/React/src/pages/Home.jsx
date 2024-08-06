@@ -10,6 +10,7 @@ function HomePage() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             My Website
           </Typography>
+          <Button color="inherit" href="/dashboard">Dashboard</Button>
           <Button color="inherit" href="/login">Login</Button>
           <Button color="inherit" href="/register">Register</Button>
         </Toolbar>

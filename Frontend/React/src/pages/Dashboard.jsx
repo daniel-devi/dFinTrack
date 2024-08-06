@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { CssBaseline, Box } from "@mui/material";
 import Sidebar from "../components/DashboardPage/SideBar";
 import Header from "../components/DashboardPage/Header";
 import DashboardPage from "../components/DashboardPage/DashboardPage";
+import AppAppBar from "../components/AppNavBar";
 
 function Dashboard() {
   // State to track the selected menu item
@@ -41,6 +42,7 @@ function Dashboard() {
       >
         {/* Header for the application */}
         <Header />
+        <AppAppBar/>
         {/* Sidebar for navigation */}
         <Sidebar onMenuClick={setSelectedMenu} />
         {/* Render the selected content */}
