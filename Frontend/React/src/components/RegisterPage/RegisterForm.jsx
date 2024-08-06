@@ -70,7 +70,7 @@ const RegisterForm = ({ handleSubmit, error }) => {
       <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
         Sign Up
       </Button>
-      <Typography>{error}</Typography> {/* Display any error messages */}
+      <Typography color={"error"}>{error}</Typography> {/* Display any error messages */}
       <Grid container justifyContent="flex-end">
         <Grid item>
           <Link href="login" variant="body2">

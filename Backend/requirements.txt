@@ -1,0 +1,12 @@
+Django>=3.5
+djangorestframework>=0.01
+django-jazzmin>=3.0
+python-dotenv>=1.0.1
+djoser>=2.2.3
+django-cors-headers>=4.4
+djangorestframework-simplejwt>=5.3.1
+Pillow>=10.4.0
+celery>=5.4
+cryptography>=43.0.0
+pandas>=2.2.2
+transformers>=4.4.3.4

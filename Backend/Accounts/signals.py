@@ -27,8 +27,7 @@ def save_user_profile(sender, instance, **kwargs):
 @receiver(post_save, sender=User)
 def create_user_account(sender, instance, created, **kwargs):
     if created:
-        Account.objects.create(user=instance, account_type= ("current", "current"), name=f"{instance.username} Account")
-        
+        Account.objects.create(user=instance, account_type="current" )
 # Updates Model object on Save if Model has a related User
 @receiver(post_save, sender=User)
 def save_user_account(sender, instance, **kwargs):
