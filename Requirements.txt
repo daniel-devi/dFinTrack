@@ -16,7 +16,7 @@
 
 # Frontend Requirement
 1. React 18.0 or later
-2. React Router 6.26 or Later
+2. React Router-dom 6.26 or Later
 3. Axios 1.7.3 or Later
 4. Jwt-decode 4.0.0 or Later
 5. Material-ui 5.16.6 or Later

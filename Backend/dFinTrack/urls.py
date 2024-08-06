@@ -31,7 +31,7 @@ urlpatterns = [
     path("api/user/register/", CreateUserView.as_view(), name="register"), # User Registration
     path('auth/', include('djoser.urls')), # URL For BASIC User Authentication
     # Core App Url Path
-    path('core-api/', include('Core.urls')),
+    path('Core-api/', include('Core.urls')),
     # Accounts App Url Path
     path('Accounts-api/', include('Accounts.urls')),
 ]
