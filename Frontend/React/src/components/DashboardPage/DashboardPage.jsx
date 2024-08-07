@@ -9,7 +9,7 @@ import CreditCardInfo from "./CreditCardInfo";
 // Main Dashboard component
 const DashboardPage = () => {
   return (
-    <Grid container spacing={3}>
+    <Grid container spacing={3} mt={"10px"}>
       <Grid item xs={6}>
         <BudgetOverview />
       </Grid>

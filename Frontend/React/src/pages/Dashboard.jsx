@@ -3,13 +3,13 @@ import { CssBaseline, Box } from "@mui/material";
 import Sidebar from "../components/DashboardPage/SideBar";
 import Header from "../components/DashboardPage/Header";
 import DashboardPage from "../components/DashboardPage/DashboardPage";
-import AppAppBar from "../components/AppNavBar";
+import NavBar from "../components/AppNavBar";
 
 function Dashboard() {
   // State to track the selected menu item
   const [selectedMenu, setSelectedMenu] = useState("dashboard");
 
-  const drawerWidth = 240
+  const drawerWidth = 240;
 
   // Function to render the content based on the selected menu item
   const renderContent = () => {
@@ -40,9 +40,9 @@ function Dashboard() {
           marginLeft: `${drawerWidth}px`,
         }}
       >
+        <NavBar />
         {/* Header for the application */}
         <Header />
-        <AppAppBar/>
         {/* Sidebar for navigation */}
         <Sidebar onMenuClick={setSelectedMenu} />
         {/* Render the selected content */}

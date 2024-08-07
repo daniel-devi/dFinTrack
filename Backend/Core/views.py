@@ -1,78 +1,160 @@
 from django.shortcuts import render
-from django.conf import settings
-from django.http import Http404, JsonResponse
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-# Core
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+# Import serializers and models
 from .serializer import *
 from .models import *
 from .ai_module import generate_financial_report
-# Restframework
-from rest_framework import viewsets
-from rest_framework.generics import *
-from rest_framework.views import *
-from rest_framework.permissions import *
-from rest_framework import generics
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.parsers import MultiPartParser, FormParser
 
 # Create your views here.
 
 @login_required
 def generate_report_view(request):
+    """
+    Generate a financial report for the logged-in user and save it to the database.
+    Returns a JSON response containing the newly created report.
+    """
     user = request.user
     report_text = generate_financial_report(user)
-    data = FinancialReport.objects.create(user=user, report_name="AI Generated Report", report_data={'summary': report_text})
-    response = JsonResponse(data, status=200)
-    
-    return response
+    report = FinancialReport.objects.create(
+        user=user,
+        report_name="AI Generated Report",
+        report_data={'summary': report_text}
+    )
+    # Serialize the created report for the response
+    serializer = FinancialReportSerializer(report)
+    return JsonResponse(serializer.data, status=200)
 
-class ExpenseCategoryViewSet(viewsets.ModelViewSet):
-    """ViewSet for managing ExpenseCategory instances."""
-    queryset = ExpenseCategory.objects.all()
+class ExpenseCategoryListView(generics.ListAPIView):
+    """
+    List all ExpenseCategory instances for the specified user.
+    """
     serializer_class = ExpenseCategorySerializer
+    permission_classes = [IsAuthenticated]
 
-class TransactionViewSet(viewsets.ModelViewSet):
-    """ViewSet for managing Transaction instances."""
-    queryset = Transaction.objects.all()
+    def get_queryset(self):
+        """
+        Filter ExpenseCategory instances by the user specified in the URL parameter.
+        """
+        user_id = self.kwargs.get('user_id')
+        return ExpenseCategory.objects.filter(user_id=user_id)
+
+class TransactionListView(generics.ListAPIView):
+    """
+    List all Transaction instances for the specified user.
+    """
     serializer_class = TransactionSerializer
+    permission_classes = [IsAuthenticated]
 
-class BudgetViewSet(viewsets.ModelViewSet):
-    """ViewSet for managing Budget instances."""
-    queryset = Budget.objects.all()
+    def get_queryset(self):
+        """
+        Filter Transaction instances by the user specified in the URL parameter.
+        """
+        user_id = self.kwargs.get('user_id')
+        return Transaction.objects.filter(user_id=user_id)
+
+class BudgetListView(generics.ListAPIView):
+    """
+    List all Budget instances for the specified user.
+    """
     serializer_class = BudgetSerializer
+    permission_classes = [IsAuthenticated]
 
-class FinancialGoalViewSet(viewsets.ModelViewSet):
-    """ViewSet for managing FinancialGoal instances."""
-    queryset = FinancialGoal.objects.all()
+    def get_queryset(self):
+        """
+        Filter Budget instances by the user specified in the URL parameter.
+        """
+        user_id = self.kwargs.get('user_id')
+        return Budget.objects.filter(user_id=user_id)
+
+class FinancialGoalListView(generics.ListAPIView):
+    """
+    List all FinancialGoal instances for the specified user.
+    """
     serializer_class = FinancialGoalSerializer
+    permission_classes = [IsAuthenticated]
 
-class NotificationViewSet(viewsets.ModelViewSet):
-    """ViewSet for managing Notification instances."""
-    queryset = Notification.objects.all()
+    def get_queryset(self):
+        """
+        Filter FinancialGoal instances by the user specified in the URL parameter.
+        """
+        user_id = self.kwargs.get('user_id')
+        return FinancialGoal.objects.filter(user_id=user_id)
+
+
+#? Notification
+
+class NotificationListView(generics.ListAPIView):
+    """
+    List all Notification instances for the specified user.
+    """
     serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
 
-class UpdateViewSet(viewsets.ModelViewSet):
-    """ViewSet for managing Update instances."""
-    queryset = Update.objects.all()
+    def get_queryset(self):
+        """
+        Filter Notification instances by the user specified in the URL parameter.
+        """
+        user_id = self.kwargs.get('user_id')
+        return Notification.objects.filter(user_id=user_id)
+    
+class NotificationListUnreadView(generics.ListAPIView):
+    """
+    List all Notification instances for the specified user.
+    """
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Filter Notification instances by the user specified in the URL parameter 
+        and filter unread Notification.
+        """
+        user_id = self.kwargs.get('user_id')
+        return Notification.objects.filter(user_id=user_id).exclude(is_read=True)
+
+class UpdateListView(generics.ListAPIView):
+    """
+    List all Update instances for the specified user.
+    """
     serializer_class = UpdateSerializer
+    permission_classes = [IsAuthenticated]
 
-class FinancialAnalyticsViewSet(viewsets.ModelViewSet):
-    """ViewSet for managing FinancialAnalytics instances."""
-    queryset = FinancialAnalytics.objects.all()
+    def get_queryset(self):
+        """
+        Filter Update instances by the user specified in the URL parameter.
+        """
+        user_id = self.kwargs.get('user_id')
+        return Update.objects.filter(user_id=user_id)
+
+class FinancialAnalyticsListView(generics.ListAPIView):
+    """
+    List all FinancialAnalytics instances for the specified user.
+    """
     serializer_class = FinancialAnalyticsSerializer
+    permission_classes = [IsAuthenticated]
 
-    def perform_update(self, serializer):
-        """Update financial analytics after saving."""
-        instance = serializer.save()
-        instance.update_analytics()
+    def get_queryset(self):
+        """
+        Filter FinancialAnalytics instances by the user specified in the URL parameter.
+        """
+        user_id = self.kwargs.get('user_id')
+        return FinancialAnalytics.objects.filter(user_id=user_id)
 
-class FinancialReportViewSet(viewsets.ModelViewSet):
-    """ViewSet for managing FinancialReport instances."""
-    queryset = FinancialReport.objects.all()
+class FinancialReportListView(generics.ListAPIView):
+    """
+    List all FinancialReport instances for the specified user.
+    """
     serializer_class = FinancialReportSerializer
+    permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        """Generate report data before saving."""
-        instance = serializer.save()
-        instance.generate_report()
+    def get_queryset(self):
+        """
+        Filter FinancialReport instances by the user specified in the URL parameter.
+        """
+        user_id = self.kwargs.get('user_id')
+        return FinancialReport.objects.filter(user_id=user_id)

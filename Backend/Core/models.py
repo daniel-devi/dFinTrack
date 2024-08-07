@@ -332,6 +332,7 @@ class Update(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # The user affected by the update
     update_type = models.CharField(max_length=50, choices=UPDATE_TYPES)  # Type of update
     message = models.TextField()  # Content of the update
+   #is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)  # When the update was created
 
     def __str__(self):

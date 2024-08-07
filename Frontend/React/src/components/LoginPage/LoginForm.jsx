@@ -23,6 +23,7 @@ const LoginForm = () => {
   const [errorMessageUsername, setErrorMessageUsername] = useState("");
   const [errorMessagePassword, setErrorMessagePassword] = useState("");
   const [dUsername, setDUsername] = useState("");
+  let userID = "";
 
   // Fetch the list of usernames when the component mounts
   useEffect(() => {
@@ -39,8 +40,12 @@ const LoginForm = () => {
   // Function to find a username by email
   const findUsername = async (theEmail) => {
     try {
-      let res = await api.get(`Accounts-api/User/get-user-through-email/${theEmail}`);
+      let res = await api.get(
+        `Accounts-api/User/get-user-through-email/${theEmail}`
+      );
       setDUsername(res.data[0].username);
+      setDUsername(res.data[0].username);
+      userID = res.data[0].id;
     } catch (error) {
       // Do Nothing
     }
@@ -63,6 +68,7 @@ const LoginForm = () => {
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
         localStorage.setItem("User", res.data.access);
+        localStorage.setItem("User_id", userID);
         setErrorMessagePassword("");
         setErrorMessageUsername("");
         setOpen(true);

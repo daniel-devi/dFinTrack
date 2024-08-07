@@ -1,20 +1,11 @@
-import React from 'react';
-import { AppBar, Toolbar, Typography, Container, Box, Button } from '@mui/material';
+import { Typography, Container, Box } from '@mui/material';
+import NavBar from '../components/AppNavBar';
 
 function HomePage() {
   return (
     <div>
       {/* Navigation Bar */}
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            My Website
-          </Typography>
-          <Button color="inherit" href="/dashboard">Dashboard</Button>
-          <Button color="inherit" href="/login">Login</Button>
-          <Button color="inherit" href="/register">Register</Button>
-        </Toolbar>
-      </AppBar>
+      <NavBar/>
 
       {/* Main Content */}
       <Container maxWidth="md">
