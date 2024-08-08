@@ -41,12 +41,13 @@ class ExpenseCategory(models.Model):
 
 #* Model For Transactions
 TRANSACTION_TYPES = (
-        ('debit', 'Debit'),
-        ('credit', 'Credit'),
-        ('purchase', 'Purchase'),
-        ('refund', 'Refund'),
+        'Debit',
+        'Credit',
+        'Purchase',
+        'Refund',
         # TODO: Add more transaction types as needed
-    )
+)
+
 class Transaction(models.Model):
     # Choices Variable
      

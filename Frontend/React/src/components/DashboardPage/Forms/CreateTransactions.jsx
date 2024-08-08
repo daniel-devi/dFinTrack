@@ -139,9 +139,10 @@ const CreateTransactionForm = () => {
           onChange={(e) => setTransactionType(e.target.value)}
           disabled={loading}
         >
-          {transactionTypes.map((type) => (
-            <MenuItem key={type.id} value={type.id}>
-              {type.message}
+          {transactionTypes.map((tType) => (
+            <MenuItem key={tType.id} value={tType.message}>
+              {tType.message.map()}
+              {console.log("CLG", tType.message)}
             </MenuItem>
           ))}
         </Select>
