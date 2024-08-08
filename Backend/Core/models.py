@@ -40,6 +40,13 @@ class ExpenseCategory(models.Model):
 
 
 #* Model For Transactions
+TRANSACTION_TYPES = (
+        ('debit', 'Debit'),
+        ('credit', 'Credit'),
+        ('purchase', 'Purchase'),
+        ('refund', 'Refund'),
+        # TODO: Add more transaction types as needed
+    )
 class Transaction(models.Model):
     # Choices Variable
      
@@ -235,7 +242,7 @@ class Transaction(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True, editable=True) # Time of the Transaction
     
     def __str__(self):
-        return f"{self.CURRENCY_CHOICES} {self.amount} on {self.timestamp} - {self.description}"
+        return f"{self.currency} {self.amount} on {self.timestamp} - {self.description}"
 
 
 #* Model Budgets
@@ -364,17 +371,8 @@ class FinancialReport(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE) # User Account
     report_name = models.CharField(max_length=300) # Title of Report
     generated_on = models.DateTimeField(auto_now_add=True) # Date generated
-    report_data = models.JSONField() # Data in Json Format to be sent to Frontend
+    report_data = models.TextField() # Data in Json Format to be sent to Frontend
 
-    def generate_report(self): # Create Report
-        analytics = FinancialAnalytics.objects.filter(account=self.account, user=self.user).latest('report_date')
-        self.report_data = {
-            'total_income': str(analytics.total_income),
-            'total_expenses': str(analytics.total_expenses),
-            'net_balance': str(analytics.net_balance),
-            'report_date': analytics.report_date.strftime('%Y-%m-%d %H:%M:%S')
-        }
-        self.save()
 
     def __str__(self):
-        return f"Report: {self.report_name} for {self.account.name} on {self.generated_on}"
+        return f"Report: {self.report_name} for {self.user} on {self.generated_on}"

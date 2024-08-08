@@ -44,7 +44,6 @@ const LoginForm = () => {
         `Accounts-api/User/get-user-through-email/${theEmail}`
       );
       setDUsername(res.data[0].username);
-      setDUsername(res.data[0].username);
       userID = res.data[0].id;
     } catch (error) {
       // Do Nothing
@@ -78,7 +77,7 @@ const LoginForm = () => {
         }, 3500);
       }
     } catch (error) {
-      if (error.response.status !== 200) {
+      if (error.response.status === 401) {
         // Check for bad request
         setError(true);
         let foundUser = Boolean(

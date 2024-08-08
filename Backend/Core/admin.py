@@ -50,3 +50,26 @@ class UpdateAdmin(admin.ModelAdmin):
     list_filter = ('update_type',)
     search_fields = ('message',)
     
+
+# Financial Analytics ModelAdmin
+@admin.register(FinancialAnalytics)
+class FinancialAnalyticsAdmin(admin.ModelAdmin):
+    """
+    Admin view for FinancialAnalytics model.
+    """
+    list_display = ('user', 'account', 'total_income', 'total_expenses', 'net_balance', 'report_date')
+    search_fields = ('user__username', 'account__name')
+    list_filter = ('user', 'account', 'report_date')
+    ordering = ('-report_date',)
+
+
+# Financial Report ModelAdmin
+@admin.register(FinancialReport)
+class FinancialReportAdmin(admin.ModelAdmin):
+    """
+    Admin view for FinancialReport model.
+    """
+    list_display = ('user', 'account', 'report_name', 'generated_on')
+    search_fields = ('user__username', 'account__name', 'report_name')
+    list_filter = ('user', 'account', 'generated_on')
+    ordering = ('-generated_on',)

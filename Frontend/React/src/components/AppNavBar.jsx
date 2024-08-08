@@ -50,6 +50,15 @@ export default function NavBar() {
     });
   }, []);
 
+   // Fetch user information
+   {/** 
+   useEffect(() => {
+    api.post("/Core-api/Financial-report/generate-report").then((response) => {
+      console.log(response.data);
+    });
+  }, []);
+*/}
+  
   // Fetch user Notification
   useEffect(() => {
     api
@@ -92,7 +101,7 @@ export default function NavBar() {
         <div>
           <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
           <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-          <MenuItem href="/logout">Logout</MenuItem>
+          <Button color="error" sx={{ml:"10px"}} href="/logout">Logout</Button>
         </div>
       )}
     </Menu>
@@ -163,46 +172,46 @@ export default function NavBar() {
           <Button href="/dashboard" color="inherit">
             Dashboard
           </Button>
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton
-              size="large"
-              aria-label="show 4 new mails"
-              color="inherit"
-            >
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              color="inherit"
-            >
-              <Badge badgeContent={userNotificationCount} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            {isAuthorized ? (
-              <Box>
-                <IconButton
-                  size="large"
-                  edge="end"
-                  aria-label="account of current user"
-                  aria-controls={menuId}
-                  aria-haspopup="true"
-                  onClick={handleProfileMenuOpen}
-                  color="inherit"
-                >
-                  <AccountCircle />
-                </IconButton>
-              </Box>
-            ) : (
-              <Box sx={{ display: { xs: "flex" } }}>
-                <Button href="/login">Login</Button>
-                <Button href="/register">Register</Button>
-              </Box>
-            )}
-          </Box>
+
+          {isAuthorized ? (
+            <Box sx={{ display: { xs: "none", md: "flex" } }}>
+              <IconButton
+                size="large"
+                aria-label="show 4 new mails"
+                color="inherit"
+              >
+                <Badge badgeContent={4} color="error">
+                  <MailIcon />
+                </Badge>
+              </IconButton>
+              <IconButton
+                size="large"
+                aria-label="show 17 new notifications"
+                color="inherit"
+              >
+                <Badge badgeContent={userNotificationCount} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-controls={menuId}
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+            </Box>
+          ) : (
+            <Box sx={{ display: { xs: "flex" } }}>
+              <Button href="/login">Login</Button>
+              <Button href="/register">Register</Button>
+            </Box>
+          )}
         </Toolbar>
       </AppBar>
       {renderMobileMenu}

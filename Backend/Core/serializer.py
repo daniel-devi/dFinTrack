@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.permissions import AllowAny
 from .models import *
 from django.contrib.auth.models import User
 from Accounts.models import Account
@@ -8,6 +9,18 @@ class ExpenseCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpenseCategory
         fields = '__all__'  # Serialize all fields
+
+    def validate_category_type(self, value):
+        """Ensure the category type is valid."""
+        if value not in dict(ExpenseCategory.CATEGORY_TYPES).keys():
+            raise serializers.ValidationError("Invalid category type.")
+        return value
+
+# Category Names
+class ExpenseCategoryNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExpenseCategory
+        fields = ["id", 'name', 'created_by',]  # Serialize only name
 
     def validate_category_type(self, value):
         """Ensure the category type is valid."""
@@ -27,6 +40,12 @@ class TransactionSerializer(serializers.ModelSerializer):
         if value not in dict(Transaction.CURRENCY_CHOICES).keys():
             raise serializers.ValidationError("Invalid currency.")
         return value
+
+# Transaction Currency Choice
+class TransactionTypeSerializer(serializers.Serializer):
+    permission_classes = [AllowAny]
+    id = serializers.IntegerField()
+    message = serializers.CharField()
 
 
 # Serializer for Budget model
@@ -100,3 +119,4 @@ class FinancialReportSerializer(serializers.ModelSerializer):
             'report_date': analytics.report_date.strftime('%Y-%m-%d %H:%M:%S')
         }
         self.save()
+

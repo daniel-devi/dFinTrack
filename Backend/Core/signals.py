@@ -7,9 +7,7 @@ from .models import *
 # Accounts
 from Accounts.models import Account
 
-
 #* Create Signals for Core Models
-
 
 #? Transaction Model 
 
@@ -32,15 +30,15 @@ def update_account_balance(sender, instance, **kwargs):
 
 
 #? Budget
-
+""
 # Update Budget Valid Field
-@receiver(post_save, sender=Budget)
+@receiver(pre_save, sender=Budget)
 def check_end_date(sender, instance, **kwargs):
     if instance.end_date == timezone.now().date():
-        # when end_date matches current date valid field is equal to false
-        instance.valid = False
+        # When end_date matches current date, set end_date to current date + 1 day
+        instance.end_date = timezone.now().date() + timezone.timedelta(days=1)
     instance.save()
-
+""
 
 # Update User Budget Amount_Spent on Transaction Model Change
 @receiver(post_save, sender=Transaction)

@@ -2,33 +2,18 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.permissions import *
 from rest_framework.response import Response
-
+from rest_framework.decorators import permission_classes
+# Third-Party Library
+import random
 # Import serializers and models
 from .serializer import *
 from .models import *
-from .ai_module import generate_financial_report
 
 # Create your views here.
-
-@login_required
-def generate_report_view(request):
-    """
-    Generate a financial report for the logged-in user and save it to the database.
-    Returns a JSON response containing the newly created report.
-    """
-    user = request.user
-    report_text = generate_financial_report(user)
-    report = FinancialReport.objects.create(
-        user=user,
-        report_name="AI Generated Report",
-        report_data={'summary': report_text}
-    )
-    # Serialize the created report for the response
-    serializer = FinancialReportSerializer(report)
-    return JsonResponse(serializer.data, status=200)
-
 class ExpenseCategoryListView(generics.ListAPIView):
     """
     List all ExpenseCategory instances for the specified user.
@@ -41,7 +26,23 @@ class ExpenseCategoryListView(generics.ListAPIView):
         Filter ExpenseCategory instances by the user specified in the URL parameter.
         """
         user_id = self.kwargs.get('user_id')
-        return ExpenseCategory.objects.filter(user_id=user_id)
+        return ExpenseCategory.objects.filter(created_by_id=user_id)
+    
+    
+class ExpenseCategoryNameListView(generics.ListAPIView):
+    """
+    List all ExpenseCategory instances for the specified user.
+    """
+    serializer_class = ExpenseCategoryNameSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Filter ExpenseCategory instances by the user specified in the URL parameter.
+        """
+        user_id = self.kwargs.get('user_id')
+        return ExpenseCategory.objects.filter(created_by_id=user_id)
+    
 
 class TransactionListView(generics.ListAPIView):
     """
@@ -56,6 +57,23 @@ class TransactionListView(generics.ListAPIView):
         """
         user_id = self.kwargs.get('user_id')
         return Transaction.objects.filter(user_id=user_id)
+    
+    
+@permission_classes([AllowAny])
+class TransactionTypeView(APIView):
+    permission_class = [AllowAny]
+    def get(self, request):
+        # Define the data to be serialized
+        data = {
+            "id": random.randint(1, 100),
+            "message": TRANSACTION_TYPES,
+        }
+        
+        # Serialize the data
+        serializer = TransactionTypeSerializer(data)
+        
+        # Return the serialized data as a response
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class BudgetListView(generics.ListAPIView):
     """
